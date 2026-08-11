@@ -1,0 +1,1 @@
+var json_DarsenaNavigli_18 = {"type":"FeatureCollection","name":"DarsenaNavigli_18","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{"fid":10.0,"id":10.0,"nome":"Darsena Navigli","categoria":"attrazione","descrizione":null},"geometry":{"type":"Point","coordinates":[9.175263132123851,45.453310863815418]}}]}

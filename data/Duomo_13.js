@@ -1,0 +1,1 @@
+var json_Duomo_13 = {"type":"FeatureCollection","name":"Duomo_13","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{"fid":1.0,"id":1.0,"nome":"Duomo","categoria":"attrazione","descrizione":null},"geometry":{"type":"Point","coordinates":[9.190182140415226,45.464213675504986]}}]}

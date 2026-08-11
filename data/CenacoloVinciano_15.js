@@ -1,0 +1,1 @@
+var json_CenacoloVinciano_15 = {"type":"FeatureCollection","name":"CenacoloVinciano_15","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{"fid":4.0,"id":4.0,"nome":"Cenacolo Vinciano","categoria":"attrazione","descrizione":null},"geometry":{"type":"Point","coordinates":[9.170568543506548,45.466142202377647]}}]}

@@ -1,0 +1,1 @@
+var json_ArcodellaPace_14 = {"type":"FeatureCollection","name":"ArcodellaPace_14","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{"fid":5.0,"id":5.0,"nome":"Arco della pace","categoria":"attrazione","descrizione":null},"geometry":{"type":"Point","coordinates":[9.17254130068874,45.475570889855618]}}]}

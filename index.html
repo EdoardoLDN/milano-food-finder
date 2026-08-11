@@ -1,0 +1,2486 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet.photon.css"> 
+
+    <style>
+
+.attraction-popup {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  width: 460px;
+  max-width: 460px;
+  min-height: 180px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.attraction-popup__text {
+  flex: 1;
+  min-width: 0;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.attraction-popup__text h3 {
+  margin: 0 0 10px;
+  color: #202124;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.attraction-popup__address {
+  margin: 0 0 10px;
+  color: #5f6368;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.attraction-popup__description {
+  margin: 0 0 14px;
+  color: #3c4043;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.attraction-popup__button {
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 8px 12px;
+  border-radius: 18px;
+  background: #1a73e8;
+  color: #fff !important;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.attraction-popup__image {
+    width: 210px !important;
+    min-width: 210px !important;
+    max-width: 210px !important;
+    height: 180px !important;
+    max-height: 180px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+}
+
+.attraction-popup img {
+    width: 210px !important;
+    min-width: 210px !important;
+    max-width: 210px !important;
+    height: 180px !important;
+    max-height: 180px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+}
+
+.leaflet-popup-content:has(.attraction-popup) {
+    margin: 0;
+    width: auto !important;
+}
+
+.leaflet-popup-content-wrapper:has(.attraction-popup) {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 14px;
+}
+       
+.sidebar-select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: #fff;
+    font-size: 14px;
+    color: #1f2937;
+}
+.filter-label {
+    display: block;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 6px;
+}
+</style>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+.attraction-label {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
+}
+
+.attraction-label::before {
+  border-top-color: rgba(255, 255, 255, 0.72) !important;
+}
+
+
+       
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+}
+
+#app {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#sidebar {
+    width: 320px;
+    height: 100%;
+    background: #f8f9fa;
+    padding: 25px;
+    overflow-y: auto;
+    box-shadow: 3px 0 15px rgba(0,0,0,0.15);
+    display: flex;
+flex-direction: column;
+}
+
+#map {
+    flex: 1;
+    height: 100%;
+}
+
+h1 {
+    margin: 0;
+    font-size: 27px;
+    line-height: 1.08;
+    font-weight: 750;
+    letter-spacing: -0.4px;
+    color: #222;
+}
+
+.brand-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.milan-logo {
+    width: 38px;
+    height: auto;
+    flex-shrink: 0;
+}
+
+.intro {
+    margin: 0 0 28px 0;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #555;
+}
+
+.results-count {
+    display: inline-block;
+    margin: 4px 0 12px;
+    padding: 4px 9px;
+    background: #f2f2f2;
+    border-radius: 12px;
+    color: #666;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+h2 {
+    margin-top: 18px;
+    margin-bottom: 10px;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #222;
+}
+
+.start-section {
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.isochrone-option {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #e5e5e5;
+    font-size: 14px;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid #e5e5e5;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #888;
+}
+
+#location-button {
+    width: 100%;
+    margin-top: 8px;
+    padding: 11px 14px;
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.category-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 7px 0;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.category-filter {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.category-filter,
+#isochrone-toggle {
+    accent-color: #4f8a5b;
+}
+
+#location-button:hover {
+    background: #1557b0;
+}
+
+select,
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+button {
+    background: #222;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+}.leaflet-control-locate {
+    display: none !important;
+    }
+</style>
+<title>Milano Food Finder
+</title>    </head>
+    <body>
+        <div id="app">
+    <aside id="sidebar">
+        <div class="brand-header">
+    <img src="stemma-milano.svg" alt="Stemma di Milano" class="milan-logo">
+    <h1>Milano Food Finder</h1>
+</div>
+
+        <p class="intro">
+            Trova dove mangiare vicino alle principali attrazioni di Milano.
+        </p>
+
+        <section class="panel-section start-section">
+            <h2>📍 Punto di partenza</h2>
+
+            <select id="attraction-select">
+                <option value="">Seleziona un'attrazione</option>
+                <option value="Duomo">Duomo</option>
+                <option value="Colonne di San Lorenzo">Colonne di San Lorenzo</option>
+                <option value="Sant'Ambrogio">Sant'Ambrogio</option>
+                <option value="Cenacolo Vinciano">Cenacolo Vinciano</option>
+                <option value="Arco della Pace">Arco della Pace</option>
+                <option value="Cimitero Monumentale">Cimitero Monumentale</option>
+                <option value="Gae Aulenti">Gae Aulenti</option>
+                <option value="Stazione Centrale">Stazione Centrale</option>
+                <option value="Porta Venezia">Porta Venezia</option>
+                <option value="Darsena Navigli">Darsena Navigli</option>
+                <option value="Porta Romana">Porta Romana</option>
+            </select>
+
+            <button id="location-button" type="button">
+                Usa la mia posizione
+            </button>
+        </section>
+
+        <section class="panel-section">
+            <h2>🍴 Tipo di locale</h2>
+
+            <p id="results-count" class="results-count">
+    Seleziona un punto di partenza
+</p>
+
+            <label class="category-option">
+                <input class="category-filter" type="checkbox" value="ristorante" checked>
+                Ristoranti 🍽️
+            </label>
+
+            <label class="category-option">
+                <input class="category-filter" type="checkbox" value="caffe" checked>
+                Caffè ☕
+            </label>
+
+            <label class="category-option">
+                <input class="category-filter" type="checkbox" value="bar" checked>
+                Bar 🍸
+            </label>
+
+            <label class="category-option">
+                <input class="category-filter" type="checkbox" value="pub" checked>
+                Pub 🍺
+            </label>
+
+            <label class="category-option">
+                <input class="category-filter" type="checkbox" value="fast_food" checked>
+                Fast food 🍔
+            </label>
+
+            <label class="category-option">
+                <input class="category-filter" type="checkbox" value="gelateria" checked>
+                Gelaterie 🍦
+            </label>
+
+            <label class="category-option">
+                <input class="category-filter" type="checkbox" value="pizzeria" checked>
+                Pizzerie 🍕
+            </label>
+        </section>
+
+        <section class="panel-section">
+            <h2>⭐ Valutazione</h2>
+            <label for="rating-filter" class="filter-label">Valutazione minima</label>
+            <select id="rating-filter" class="sidebar-select">
+                <option value="0">Tutte</option>
+                <option value="3">3,0+ ⭐</option>
+                <option value="3.5">3,5+ ⭐</option>
+                <option value="4">4,0+ ⭐</option>
+                <option value="4.5">4,5+ ⭐</option>
+            </select>
+        </section>
+
+        <section class="panel-section">
+            <h2>💶 Fascia di prezzo</h2>
+            <label for="price-filter" class="filter-label">Prezzo massimo</label>
+            <select id="price-filter" class="sidebar-select">
+                <option value="all">Tutte</option>
+                <option value="1">€</option>
+                <option value="2">€€</option>
+                <option value="3">€€€</option>
+                <option value="4">€€€€</option>
+            </select>
+        </section>
+
+        <section class="panel-section">
+            <label class="category-option isochrone-option">
+                <input id="isochrone-toggle" type="checkbox">
+                 Mostra l'area raggiungibile in 10 minuti 🚶
+            </label>
+        </section>
+        <div class="sidebar-footer">
+    <div>Progetto WebGIS · Milano</div>
+    <div>Dati locali: Google Places · Isocrone: TravelTime · Base cartografica: CARTO / OpenStreetMap</div>
+</div>
+    </aside>
+
+    <div id="map"></div>
+</div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
+        <script src="data/PortaRomana_1.js"></script>
+        <script src="data/DarsenaNavigli_2.js"></script>
+        <script src="data/PortaVenezia_3.js"></script>
+        <script src="data/StazioneCentrale_4.js"></script>
+        <script src="data/GaeAulenti_5.js"></script>
+        <script src="data/CimiteroMonumentale_6.js"></script>
+        <script src="data/ArcodellaPace_7.js"></script>
+        <script src="data/CenacoloVinciano_8.js"></script>
+        <script src="data/SantAmbrogio_9.js"></script>
+        <script src="data/ColonnediSanLorenzo_10.js"></script>
+        <script src="data/Duomo_11.js"></script>
+       <script src="data/Locali_12.js"></script>
+        <script src="data/Duomo_13.js"></script>
+        <script src="data/ArcodellaPace_14.js"></script>
+        <script src="data/CenacoloVinciano_15.js"></script>
+        <script src="data/CimiteroMonumentale_16.js"></script>
+        <script src="data/ColonnediSanLorenzo_17.js"></script>
+        <script src="data/DarsenaNavigli_18.js"></script>
+        <script src="data/GaeAulenti_19.js"></script>
+        <script src="data/PortaRomana_20.js"></script>
+        <script src="data/PortaVenezia_21.js"></script>
+        <script src="data/SantAmbrogio_22.js"></script>
+        <script src="data/StazioneCentrale_23.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+    highlightLayer = e.target;
+
+    if (highlightLayer.setStyle) {
+        highlightLayer.setStyle({
+            color: 'rgba(255, 255, 0, 1.00)',
+            fillColor: 'rgba(255, 255, 0, 1.00)',
+            fillOpacity: 1
+        });
+    }
+}
+        var map = L.map('map', {
+    zoomControl:false,
+    maxZoom:22,
+    minZoom:10,
+    zoomSnap: 0.5
+}).setView([45.4642, 9.1900], 13.5);
+       
+       var positron = L.tileLayer(
+  "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  {
+    attribution:
+      '&copy; OpenStreetMap contributors &copy; CARTO',
+    subdomains: "abcd",
+    maxZoom: 20,
+  }
+);
+
+positron.addTo(map);
+       
+const attractionInfo = {
+   "Duomo": {
+    title: "Duomo di Milano",
+    image: "images/attractions/duomo.jpg",
+    address: "Piazza del Duomo, Milano",
+    description: "Il simbolo di Milano e una delle cattedrali gotiche più celebri al mondo.",
+    maps: "https://maps.google.com/?q=Duomo+di+Milano"
+},
+    "Colonne di San Lorenzo": {
+    title: "Colonne di San Lorenzo",
+    image: "images/attractions/colonne_san_lorenzo.jpg",
+    address: "Corso di Porta Ticinese, Milano",
+    description: "Uno dei luoghi più vivaci di Milano, celebre per le antiche colonne romane e la vita serale.",
+    maps: "https://maps.google.com/?q=Colonne+di+San+Lorenzo+Milano"
+},
+    "Sant'Ambrogio": {
+    title: "Basilica di Sant'Ambrogio",
+    image: "images/attractions/sant_ambrogio.jpg",
+    address: "Piazza Sant'Ambrogio, Milano",
+    description: "Una delle chiese più antiche e importanti di Milano, simbolo della città e dell'architettura romanica.",
+    maps: "https://maps.google.com/?q=Basilica+di+Sant+Ambrogio+Milano"
+},
+    "Cenacolo Vinciano": {
+    title: "Cenacolo Vinciano",
+    image: "images/attractions/cenacolo_vinciano.jpg",
+    address: "Piazza di Santa Maria delle Grazie, Milano",
+    description: "Ospita l'Ultima Cena di Leonardo da Vinci, uno dei capolavori più celebri della storia dell'arte.",
+    maps: "https://maps.google.com/?q=Cenacolo+Vinciano+Milano"
+},
+    "Arco della Pace": {
+    title: "Arco della Pace",
+    image: "images/attractions/arco_della_pace.jpg",
+    address: "Piazza Sempione, Milano",
+    description: "Monumento neoclassico tra i simboli di Milano, affacciato sul Parco Sempione.",
+    maps: "https://maps.google.com/?q=Arco+della+Pace+Milano"
+},
+    "Cimitero Monumentale": {
+    title: "Cimitero Monumentale",
+    image: "images/attractions/cimitero_monumentale.jpg",
+    address: "Piazzale Cimitero Monumentale, Milano",
+    description: "Un museo a cielo aperto che custodisce monumenti, sculture e tombe di grande valore artistico.",
+    maps: "https://maps.google.com/?q=Cimitero+Monumentale+Milano"
+},
+    "Gae Aulenti": {
+    title: "Piazza Gae Aulenti",
+    image: "images/attractions/gae_aulenti.jpg",
+    address: "Piazza Gae Aulenti, Milano",
+    description: "Il cuore della Milano contemporanea, circondato da grattacieli, negozi e spazi pubblici moderni.",
+    maps: "https://maps.google.com/?q=Piazza+Gae+Aulenti+Milano"
+},
+    "Stazione Centrale": {
+    title: "Milano Centrale",
+    image: "images/attractions/stazione_centrale.jpeg",
+    address: "Piazza Duca d'Aosta, Milano",
+    description: "Una delle stazioni ferroviarie più grandi d'Europa e importante punto di accesso alla città.",
+    maps: "https://maps.google.com/?q=Stazione+Centrale+Milano"
+},
+    "Porta Venezia": {
+    title: "Porta Venezia",
+    image: "images/attractions/porta_venezia.jpg",
+    address: "Porta Venezia, Milano",
+    description: "Storica porta d'accesso alla città, oggi punto di riferimento tra architettura, shopping e cultura.",
+    maps: "https://maps.google.com/?q=Porta+Venezia+Milano"
+},
+    "Porta Romana": {
+    title: "Porta Romana",
+    image: "images/attractions/porta_romana.jpg",
+    address: "Porta Romana, Milano",
+    description: "Una delle antiche porte di Milano, oggi cuore di un vivace quartiere ricco di storia e locali.",
+    maps: "https://maps.google.com/?q=Porta+Romana+Milano"
+},
+    "Darsena Navigli": {
+    title: "Darsena dei Navigli",
+    image: "images/attractions/darsena.jpg",
+    address: "Piazza XXIV Maggio, Milano",
+    description: "Il cuore dei Navigli, ideale per passeggiare, rilassarsi e vivere la vivace atmosfera milanese.",
+    maps: "https://maps.google.com/?q=Darsena+Milano"
+},
+};
+
+function createAttractionPopup(name) {
+  const info = attractionInfo[name];
+
+  if (!info) {
+    return `<div style="padding:10px;font-weight:600;">${name}</div>`;
+  }
+
+  return `
+    <div class="attraction-popup">
+      <div class="attraction-popup__text">
+        <h3>${info.title || name}</h3>
+
+        <p class="attraction-popup__address">
+          📍 ${info.address}
+        </p>
+
+        <p class="attraction-popup__description">
+          ${info.description}
+        </p>
+
+        <a
+          class="attraction-popup__button"
+          href="${info.maps}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+         Apri in Google Maps
+        </a>
+      </div>
+
+      <img
+        class="attraction-popup__image"
+        src="${info.image}"
+        alt="${name}"
+      >
+    </div>
+  `;
+}
+
+     //   var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // modify popup if contains media
+        function addClassToPopupIfMedia(content, popup) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            var imgTd = tempDiv.querySelector('td img');
+            if (imgTd) {
+                var src = imgTd.getAttribute('src');
+                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
+                    popup._contentNode.classList.add('media');
+                    var img = popup._contentNode.querySelector('td img');
+                    if (img) {
+                        // If already loaded (cache), update immediately
+                        if (img.complete && img.naturalHeight > 0) {
+                            popup.update();
+                        } else {
+                            img.addEventListener('load', function() {
+                                popup.update();
+                            });
+                            img.addEventListener('error', function() {
+                                popup.update();
+                            });
+                        }
+                    }
+                } else if (/\.(mp3|wav|ogg|aac)$/i.test(src)) {
+                    var audio = document.createElement('audio');
+                    audio.controls = true;
+                    audio.src = src;
+                    imgTd.parentNode.replaceChild(audio, imgTd);
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp4|webm|ogg|mov)$/i.test(src)) {
+                    var video = document.createElement('video');
+                    video.controls = true;
+                    video.src = src;
+                    video.style.width = "400px";
+                    video.style.height = "300px";
+                    video.style.maxHeight = "60vh";
+                    video.style.maxWidth = "60vw";
+                    imgTd.parentNode.replaceChild(video, imgTd);
+                    popup._contentNode.classList.add('media');
+                    // Aggiorna il popup quando il video carica i metadati
+                    video.addEventListener('loadedmetadata', function() {
+                        popup.update();
+                    });
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else {
+                    popup._contentNode.classList.remove('media');
+                }
+            } else {
+                popup._contentNode.classList.remove('media');
+            }
+        }
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var locateControl = L.control.locate({
+    locateOptions: {
+        maxZoom: 19
+    }
+}).addTo(map);
+
+document.getElementById('location-button').addEventListener('click', function () {
+    locateControl.start();
+});
+
+map.on('locationfound', function(e) {
+    console.log(e.latlng);
+
+    const attractionSelect = document.getElementById('attraction-select');
+    if (attractionSelect) {
+        attractionSelect.value = "";
+    }
+
+    const isochroneToggle = document.getElementById('isochrone-toggle');
+    if (isochroneToggle) {
+        isochroneToggle.checked = false;
+    }
+
+    Object.values(isochroneLayers).forEach((layer) => {
+        if (map.hasLayer(layer)) {
+            map.removeLayer(layer);
+        }
+    });
+
+    showNearbyPlaces(e.latlng, 800);
+});
+
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        //    map.setMaxBounds(map.getBounds());
+            map.setMinZoom(map.getZoom());
+        }
+        function pop_PortaRomana_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LON'] !== null ? autolinker.link(String(feature.properties['CENTER_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LAT'] !== null ? autolinker.link(String(feature.properties['CENTER_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MINS'] !== null ? autolinker.link(String(feature.properties['AA_MINS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MODE'] !== null ? autolinker.link(String(feature.properties['AA_MODE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL_POP'] !== null ? autolinker.link(String(feature.properties['TOTAL_POP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['attrazione'] !== null ? autolinker.link(String(feature.properties['attrazione']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_PortaRomana_1_0() {
+            return {
+                pane: 'pane_PortaRomana_1',
+                opacity: 1,
+                color: 'rgba(30,136,229,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,181,246,0.2)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_PortaRomana_1');
+        map.getPane('pane_PortaRomana_1').style.zIndex = 401;
+        map.getPane('pane_PortaRomana_1').style['mix-blend-mode'] = 'normal';
+        var layer_PortaRomana_1 = new L.geoJson(json_PortaRomana_1, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_PortaRomana_1',
+            layerName: 'layer_PortaRomana_1',
+            pane: 'pane_PortaRomana_1',
+            onEachFeature: pop_PortaRomana_1,
+            style: style_PortaRomana_1_0,
+        });
+        bounds_group.addLayer(layer_PortaRomana_1);
+        function pop_DarsenaNavigli_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LON'] !== null ? autolinker.link(String(feature.properties['CENTER_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LAT'] !== null ? autolinker.link(String(feature.properties['CENTER_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MINS'] !== null ? autolinker.link(String(feature.properties['AA_MINS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MODE'] !== null ? autolinker.link(String(feature.properties['AA_MODE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL_POP'] !== null ? autolinker.link(String(feature.properties['TOTAL_POP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['attrazione'] !== null ? autolinker.link(String(feature.properties['attrazione']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_DarsenaNavigli_2_0() {
+            return {
+                pane: 'pane_DarsenaNavigli_2',
+                opacity: 1,
+                color: 'rgba(30,136,229,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,181,246,0.2)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_DarsenaNavigli_2');
+        map.getPane('pane_DarsenaNavigli_2').style.zIndex = 402;
+        map.getPane('pane_DarsenaNavigli_2').style['mix-blend-mode'] = 'normal';
+        var layer_DarsenaNavigli_2 = new L.geoJson(json_DarsenaNavigli_2, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_DarsenaNavigli_2',
+            layerName: 'layer_DarsenaNavigli_2',
+            pane: 'pane_DarsenaNavigli_2',
+            onEachFeature: pop_DarsenaNavigli_2,
+            style: style_DarsenaNavigli_2_0,
+        });
+        bounds_group.addLayer(layer_DarsenaNavigli_2);
+        function pop_PortaVenezia_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LON'] !== null ? autolinker.link(String(feature.properties['CENTER_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LAT'] !== null ? autolinker.link(String(feature.properties['CENTER_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MINS'] !== null ? autolinker.link(String(feature.properties['AA_MINS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MODE'] !== null ? autolinker.link(String(feature.properties['AA_MODE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL_POP'] !== null ? autolinker.link(String(feature.properties['TOTAL_POP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['attrazione'] !== null ? autolinker.link(String(feature.properties['attrazione']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_PortaVenezia_3_0() {
+            return {
+                pane: 'pane_PortaVenezia_3',
+                opacity: 1,
+                color: 'rgba(30,136,229,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,181,246,0.2)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_PortaVenezia_3');
+        map.getPane('pane_PortaVenezia_3').style.zIndex = 403;
+        map.getPane('pane_PortaVenezia_3').style['mix-blend-mode'] = 'normal';
+        var layer_PortaVenezia_3 = new L.geoJson(json_PortaVenezia_3, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_PortaVenezia_3',
+            layerName: 'layer_PortaVenezia_3',
+            pane: 'pane_PortaVenezia_3',
+            onEachFeature: pop_PortaVenezia_3,
+            style: style_PortaVenezia_3_0,
+        });
+        bounds_group.addLayer(layer_PortaVenezia_3);
+        function pop_StazioneCentrale_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LON'] !== null ? autolinker.link(String(feature.properties['CENTER_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LAT'] !== null ? autolinker.link(String(feature.properties['CENTER_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MINS'] !== null ? autolinker.link(String(feature.properties['AA_MINS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MODE'] !== null ? autolinker.link(String(feature.properties['AA_MODE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL_POP'] !== null ? autolinker.link(String(feature.properties['TOTAL_POP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['attrazione'] !== null ? autolinker.link(String(feature.properties['attrazione']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_StazioneCentrale_4_0() {
+            return {
+                pane: 'pane_StazioneCentrale_4',
+                opacity: 1,
+                color: 'rgba(30,136,229,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,181,246,0.2)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_StazioneCentrale_4');
+        map.getPane('pane_StazioneCentrale_4').style.zIndex = 404;
+        map.getPane('pane_StazioneCentrale_4').style['mix-blend-mode'] = 'normal';
+        var layer_StazioneCentrale_4 = new L.geoJson(json_StazioneCentrale_4, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_StazioneCentrale_4',
+            layerName: 'layer_StazioneCentrale_4',
+            pane: 'pane_StazioneCentrale_4',
+            onEachFeature: pop_StazioneCentrale_4,
+            style: style_StazioneCentrale_4_0,
+        });
+        bounds_group.addLayer(layer_StazioneCentrale_4);
+        function pop_GaeAulenti_5(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LON'] !== null ? autolinker.link(String(feature.properties['CENTER_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LAT'] !== null ? autolinker.link(String(feature.properties['CENTER_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MINS'] !== null ? autolinker.link(String(feature.properties['AA_MINS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MODE'] !== null ? autolinker.link(String(feature.properties['AA_MODE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL_POP'] !== null ? autolinker.link(String(feature.properties['TOTAL_POP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['attrazione'] !== null ? autolinker.link(String(feature.properties['attrazione']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_GaeAulenti_5_0() {
+            return {
+                pane: 'pane_GaeAulenti_5',
+                opacity: 1,
+                color: 'rgba(30,136,229,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,181,246,0.2)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_GaeAulenti_5');
+        map.getPane('pane_GaeAulenti_5').style.zIndex = 405;
+        map.getPane('pane_GaeAulenti_5').style['mix-blend-mode'] = 'normal';
+        var layer_GaeAulenti_5 = new L.geoJson(json_GaeAulenti_5, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_GaeAulenti_5',
+            layerName: 'layer_GaeAulenti_5',
+            pane: 'pane_GaeAulenti_5',
+            onEachFeature: pop_GaeAulenti_5,
+            style: style_GaeAulenti_5_0,
+        });
+        bounds_group.addLayer(layer_GaeAulenti_5);
+        function pop_CimiteroMonumentale_6(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LON'] !== null ? autolinker.link(String(feature.properties['CENTER_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LAT'] !== null ? autolinker.link(String(feature.properties['CENTER_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MINS'] !== null ? autolinker.link(String(feature.properties['AA_MINS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MODE'] !== null ? autolinker.link(String(feature.properties['AA_MODE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL_POP'] !== null ? autolinker.link(String(feature.properties['TOTAL_POP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['attrazione'] !== null ? autolinker.link(String(feature.properties['attrazione']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_CimiteroMonumentale_6_0() {
+            return {
+                pane: 'pane_CimiteroMonumentale_6',
+                opacity: 1,
+                color: 'rgba(30,136,229,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,181,246,0.2)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_CimiteroMonumentale_6');
+        map.getPane('pane_CimiteroMonumentale_6').style.zIndex = 406;
+        map.getPane('pane_CimiteroMonumentale_6').style['mix-blend-mode'] = 'normal';
+        var layer_CimiteroMonumentale_6 = new L.geoJson(json_CimiteroMonumentale_6, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_CimiteroMonumentale_6',
+            layerName: 'layer_CimiteroMonumentale_6',
+            pane: 'pane_CimiteroMonumentale_6',
+            onEachFeature: pop_CimiteroMonumentale_6,
+            style: style_CimiteroMonumentale_6_0,
+        });
+        bounds_group.addLayer(layer_CimiteroMonumentale_6);
+        function pop_ArcodellaPace_7(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LON'] !== null ? autolinker.link(String(feature.properties['CENTER_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LAT'] !== null ? autolinker.link(String(feature.properties['CENTER_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MINS'] !== null ? autolinker.link(String(feature.properties['AA_MINS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MODE'] !== null ? autolinker.link(String(feature.properties['AA_MODE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL_POP'] !== null ? autolinker.link(String(feature.properties['TOTAL_POP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['attrazione'] !== null ? autolinker.link(String(feature.properties['attrazione']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_ArcodellaPace_7_0() {
+            return {
+                pane: 'pane_ArcodellaPace_7',
+                opacity: 1,
+                color: 'rgba(30,136,229,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,181,246,0.2)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_ArcodellaPace_7');
+        map.getPane('pane_ArcodellaPace_7').style.zIndex = 407;
+        map.getPane('pane_ArcodellaPace_7').style['mix-blend-mode'] = 'normal';
+        var layer_ArcodellaPace_7 = new L.geoJson(json_ArcodellaPace_7, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_ArcodellaPace_7',
+            layerName: 'layer_ArcodellaPace_7',
+            pane: 'pane_ArcodellaPace_7',
+            onEachFeature: pop_ArcodellaPace_7,
+            style: style_ArcodellaPace_7_0,
+        });
+        bounds_group.addLayer(layer_ArcodellaPace_7);
+        function pop_CenacoloVinciano_8(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LON'] !== null ? autolinker.link(String(feature.properties['CENTER_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LAT'] !== null ? autolinker.link(String(feature.properties['CENTER_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MINS'] !== null ? autolinker.link(String(feature.properties['AA_MINS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MODE'] !== null ? autolinker.link(String(feature.properties['AA_MODE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL_POP'] !== null ? autolinker.link(String(feature.properties['TOTAL_POP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['attrazione'] !== null ? autolinker.link(String(feature.properties['attrazione']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_CenacoloVinciano_8_0() {
+            return {
+                pane: 'pane_CenacoloVinciano_8',
+                opacity: 1,
+                color: 'rgba(30,136,229,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,181,246,0.2)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_CenacoloVinciano_8');
+        map.getPane('pane_CenacoloVinciano_8').style.zIndex = 408;
+        map.getPane('pane_CenacoloVinciano_8').style['mix-blend-mode'] = 'normal';
+        var layer_CenacoloVinciano_8 = new L.geoJson(json_CenacoloVinciano_8, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_CenacoloVinciano_8',
+            layerName: 'layer_CenacoloVinciano_8',
+            pane: 'pane_CenacoloVinciano_8',
+            onEachFeature: pop_CenacoloVinciano_8,
+            style: style_CenacoloVinciano_8_0,
+        });
+        bounds_group.addLayer(layer_CenacoloVinciano_8);
+        function pop_SantAmbrogio_9(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LON'] !== null ? autolinker.link(String(feature.properties['CENTER_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LAT'] !== null ? autolinker.link(String(feature.properties['CENTER_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MINS'] !== null ? autolinker.link(String(feature.properties['AA_MINS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MODE'] !== null ? autolinker.link(String(feature.properties['AA_MODE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL_POP'] !== null ? autolinker.link(String(feature.properties['TOTAL_POP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['attrazione'] !== null ? autolinker.link(String(feature.properties['attrazione']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_SantAmbrogio_9_0() {
+            return {
+                pane: 'pane_SantAmbrogio_9',
+                opacity: 1,
+                color: 'rgba(30,136,229,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,181,246,0.2)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_SantAmbrogio_9');
+        map.getPane('pane_SantAmbrogio_9').style.zIndex = 409;
+        map.getPane('pane_SantAmbrogio_9').style['mix-blend-mode'] = 'normal';
+        var layer_SantAmbrogio_9 = new L.geoJson(json_SantAmbrogio_9, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_SantAmbrogio_9',
+            layerName: 'layer_SantAmbrogio_9',
+            pane: 'pane_SantAmbrogio_9',
+            onEachFeature: pop_SantAmbrogio_9,
+            style: style_SantAmbrogio_9_0,
+        });
+        bounds_group.addLayer(layer_SantAmbrogio_9);
+        function pop_ColonnediSanLorenzo_10(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LON'] !== null ? autolinker.link(String(feature.properties['CENTER_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LAT'] !== null ? autolinker.link(String(feature.properties['CENTER_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MINS'] !== null ? autolinker.link(String(feature.properties['AA_MINS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MODE'] !== null ? autolinker.link(String(feature.properties['AA_MODE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL_POP'] !== null ? autolinker.link(String(feature.properties['TOTAL_POP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['attrazione'] !== null ? autolinker.link(String(feature.properties['attrazione']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_ColonnediSanLorenzo_10_0() {
+            return {
+                pane: 'pane_ColonnediSanLorenzo_10',
+                opacity: 1,
+                color: 'rgba(30,136,229,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,181,246,0.2)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_ColonnediSanLorenzo_10');
+        map.getPane('pane_ColonnediSanLorenzo_10').style.zIndex = 410;
+        map.getPane('pane_ColonnediSanLorenzo_10').style['mix-blend-mode'] = 'normal';
+        var layer_ColonnediSanLorenzo_10 = new L.geoJson(json_ColonnediSanLorenzo_10, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_ColonnediSanLorenzo_10',
+            layerName: 'layer_ColonnediSanLorenzo_10',
+            pane: 'pane_ColonnediSanLorenzo_10',
+            onEachFeature: pop_ColonnediSanLorenzo_10,
+            style: style_ColonnediSanLorenzo_10_0,
+        });
+        bounds_group.addLayer(layer_ColonnediSanLorenzo_10);
+        function pop_Duomo_11(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LON'] !== null ? autolinker.link(String(feature.properties['CENTER_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CENTER_LAT'] !== null ? autolinker.link(String(feature.properties['CENTER_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MINS'] !== null ? autolinker.link(String(feature.properties['AA_MINS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AA_MODE'] !== null ? autolinker.link(String(feature.properties['AA_MODE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL_POP'] !== null ? autolinker.link(String(feature.properties['TOTAL_POP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['attrazione'] !== null ? autolinker.link(String(feature.properties['attrazione']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Duomo_11_0() {
+            return {
+                pane: 'pane_Duomo_11',
+                opacity: 1,
+                color: 'rgba(30,136,229,0.2)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,181,246,0.2)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_Duomo_11');
+        map.getPane('pane_Duomo_11').style.zIndex = 411;
+        map.getPane('pane_Duomo_11').style['mix-blend-mode'] = 'normal';
+        var layer_Duomo_11 = new L.geoJson(json_Duomo_11, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Duomo_11',
+            layerName: 'layer_Duomo_11',
+            pane: 'pane_Duomo_11',
+            onEachFeature: pop_Duomo_11,
+            style: style_Duomo_11_0,
+        });
+        bounds_group.addLayer(layer_Duomo_11);
+        function pop_Locali_12(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+
+            const p = feature.properties;
+            const latlng = layer.getLatLng();
+
+            const categoryLabels = {
+                ristorante: "Ristorante",
+                caffe: "Caffè",
+                bar: "Bar",
+                pub: "Pub",
+                fast_food: "Fast food",
+                gelateria: "Gelateria",
+                pizzeria: "Pizzeria"
+            };
+
+            const categoryName = categoryLabels[p.categoria] || p.categoria || "Locale";
+
+            const distanceRow = p.distanza_m != null
+    ? `<div style="margin:4px 0 10px 0;font-weight:400;color:#555;">🚶 ${Math.round(Number(p.distanza_m))} m da ${p.attrazione || ""}</div>`
+    : "";
+
+            const hasRating = p.rating !== null && p.rating !== undefined && p.rating !== "";
+
+const ratingValue = hasRating ? Number(p.rating) : null;
+
+const ratingRow = hasRating && Number.isFinite(ratingValue)
+    ? `<div style="margin-top:8px;">⭐ <strong>${ratingValue.toFixed(1).replace('.', ',')} / 5</strong>${p.numero_recensioni != null ? ` (${p.numero_recensioni} valutazioni)` : ""}</div>`
+    : "";
+
+            const priceRow = p.prezzo_finale && p.prezzo_finale !== 'N/D'
+                ? `<div style="margin-top:8px;">💶 Fascia di prezzo: <strong>${p.prezzo_finale}</strong></div>`
+                : "";
+
+            const addressRow = p.indirizzo
+                ? `<div style="margin-top:8px;">📍 ${p.indirizzo}</div>`
+                : "";
+
+            const mapsRow = `
+              <div style="margin-top:12px;">
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=${latlng.lat},${latlng.lng}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style="display:inline-block; padding:8px 12px; background:#2563eb; color:#fff !important; text-decoration:none; border-radius:6px; font-weight:600;"
+                >
+                  Apri posizione in Google Maps
+                </a>
+              </div>
+            `;
+
+            const popupContent = `
+              <div style="min-width:220px;max-width:310px;font-family:Arial,sans-serif;">
+                <div style="font-size:18px;font-weight:700;margin-bottom:6px;">
+                  ${p.nome || "Locale senza nome"}
+                </div>
+                <div style="font-size:14px;color:#555;margin-bottom:8px;">
+                  ${categoryName}
+                  ${distanceRow}
+                </div>
+                ${ratingRow}
+                ${priceRow}
+                ${addressRow}
+                ${mapsRow}
+              </div>
+            `;
+
+            layer.bindPopup(popupContent, { maxWidth: 330, maxHeight: 420 });
+        }
+
+        function style_Locali_12_0(feature) {
+            const icons = {
+                bar: 'markers/bar.svg',
+                caffe: 'markers/cafe.svg',
+                fast_food: 'markers/fast_food.svg',
+                gelateria: 'markers/ice_cream.svg',
+                pizzeria: 'markers/pizzeria.svg',
+                pub: 'markers/pub.svg',
+                ristorante: 'markers/restaurant.svg'
+            };
+            return {
+                pane: 'pane_Locali_12',
+                rotationAngle: 0.0,
+                rotationOrigin: 'center center',
+                icon: L.icon({
+                    iconUrl: icons[String(feature.properties['categoria'])] || 'markers/restaurant.svg',
+                    iconSize: [11.4, 11.4]
+                }),
+                interactive: true,
+            };
+        }
+        map.createPane('pane_Locali_12');
+        map.getPane('pane_Locali_12').style.zIndex = 412;
+        map.getPane('pane_Locali_12').style['mix-blend-mode'] = 'normal';
+        var layer_Locali_12 = new L.geoJson(json_Locali_12, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Locali_12',
+            layerName: 'layer_Locali_12',
+            pane: 'pane_Locali_12',
+            onEachFeature: pop_Locali_12,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Locali_12_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Locali_12);
+        map.addLayer(layer_Locali_12);
+        function pop_Duomo_13(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var content = createAttractionPopup("Duomo");
+
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+
+			layer.bindPopup(content, {
+        maxWidth: 520,
+        maxHeight: 400
+    });
+        }
+
+        function style_Duomo_13_0() {
+            return {
+                pane: 'pane_Duomo_13',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/Duomo_13.svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Duomo_13');
+        map.getPane('pane_Duomo_13').style.zIndex = 413;
+        map.getPane('pane_Duomo_13').style['mix-blend-mode'] = 'normal';
+        var layer_Duomo_13 = new L.geoJson(json_Duomo_13, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Duomo_13',
+            layerName: 'layer_Duomo_13',
+            pane: 'pane_Duomo_13',
+            onEachFeature: pop_Duomo_13,
+            pointToLayer: function (feature, latlng) {
+    var context = {
+        feature: feature,
+        variables: {}
+    };
+
+    return L.marker(latlng, style_Duomo_13_0(feature));
+
+    return marker;
+},
+        });
+        bounds_group.addLayer(layer_Duomo_13);
+        map.addLayer(layer_Duomo_13);
+        function pop_ArcodellaPace_14(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var content = createAttractionPopup("Arco della Pace");
+
+layer.bindPopup(content, {
+    maxWidth: 520,
+    maxHeight: 400
+});
+        }
+
+        function style_ArcodellaPace_14_0() {
+            return {
+                pane: 'pane_ArcodellaPace_14',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/ArcodellaPace_14.svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_ArcodellaPace_14');
+        map.getPane('pane_ArcodellaPace_14').style.zIndex = 414;
+        map.getPane('pane_ArcodellaPace_14').style['mix-blend-mode'] = 'normal';
+        var layer_ArcodellaPace_14 = new L.geoJson(json_ArcodellaPace_14, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_ArcodellaPace_14',
+            layerName: 'layer_ArcodellaPace_14',
+            pane: 'pane_ArcodellaPace_14',
+            onEachFeature: pop_ArcodellaPace_14,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_ArcodellaPace_14_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_ArcodellaPace_14);
+        map.addLayer(layer_ArcodellaPace_14);
+        function pop_CenacoloVinciano_15(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var content = createAttractionPopup("Cenacolo Vinciano");
+
+layer.bindPopup(content, {
+    maxWidth: 520,
+    maxHeight: 400
+});
+        }
+
+        function style_CenacoloVinciano_15_0() {
+            return {
+                pane: 'pane_CenacoloVinciano_15',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/CenacoloVinciano_15.svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CenacoloVinciano_15');
+        map.getPane('pane_CenacoloVinciano_15').style.zIndex = 415;
+        map.getPane('pane_CenacoloVinciano_15').style['mix-blend-mode'] = 'normal';
+        var layer_CenacoloVinciano_15 = new L.geoJson(json_CenacoloVinciano_15, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CenacoloVinciano_15',
+            layerName: 'layer_CenacoloVinciano_15',
+            pane: 'pane_CenacoloVinciano_15',
+            onEachFeature: pop_CenacoloVinciano_15,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_CenacoloVinciano_15_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CenacoloVinciano_15);
+        map.addLayer(layer_CenacoloVinciano_15);
+        function pop_CimiteroMonumentale_16(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var content = createAttractionPopup("Cimitero Monumentale");
+
+layer.bindPopup(content, {
+    maxWidth: 520,
+    maxHeight: 400
+});
+        }
+
+        function style_CimiteroMonumentale_16_0() {
+            return {
+                pane: 'pane_CimiteroMonumentale_16',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/CimiteroMonumentale_16.svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CimiteroMonumentale_16');
+        map.getPane('pane_CimiteroMonumentale_16').style.zIndex = 416;
+        map.getPane('pane_CimiteroMonumentale_16').style['mix-blend-mode'] = 'normal';
+        var layer_CimiteroMonumentale_16 = new L.geoJson(json_CimiteroMonumentale_16, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CimiteroMonumentale_16',
+            layerName: 'layer_CimiteroMonumentale_16',
+            pane: 'pane_CimiteroMonumentale_16',
+            onEachFeature: pop_CimiteroMonumentale_16,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_CimiteroMonumentale_16_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CimiteroMonumentale_16);
+        map.addLayer(layer_CimiteroMonumentale_16);
+        function pop_ColonnediSanLorenzo_17(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var content = createAttractionPopup("Colonne di San Lorenzo");
+
+layer.bindPopup(content, {
+    maxWidth: 520,
+    maxHeight: 400
+});
+ }
+
+        function style_ColonnediSanLorenzo_17_0() {
+            return {
+                pane: 'pane_ColonnediSanLorenzo_17',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/ColonnediSanLorenzo_17.svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_ColonnediSanLorenzo_17');
+        map.getPane('pane_ColonnediSanLorenzo_17').style.zIndex = 417;
+        map.getPane('pane_ColonnediSanLorenzo_17').style['mix-blend-mode'] = 'normal';
+        var layer_ColonnediSanLorenzo_17 = new L.geoJson(json_ColonnediSanLorenzo_17, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_ColonnediSanLorenzo_17',
+            layerName: 'layer_ColonnediSanLorenzo_17',
+            pane: 'pane_ColonnediSanLorenzo_17',
+            onEachFeature: pop_ColonnediSanLorenzo_17,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_ColonnediSanLorenzo_17_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_ColonnediSanLorenzo_17);
+        map.addLayer(layer_ColonnediSanLorenzo_17);
+        function pop_DarsenaNavigli_18(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var content = createAttractionPopup("Darsena Navigli");
+
+layer.bindPopup(content, {
+    maxWidth: 520,
+    maxHeight: 400
+});
+        }
+
+        function style_DarsenaNavigli_18_0() {
+            return {
+                pane: 'pane_DarsenaNavigli_18',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/DarsenaNavigli_18.svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_DarsenaNavigli_18');
+        map.getPane('pane_DarsenaNavigli_18').style.zIndex = 418;
+        map.getPane('pane_DarsenaNavigli_18').style['mix-blend-mode'] = 'normal';
+        var layer_DarsenaNavigli_18 = new L.geoJson(json_DarsenaNavigli_18, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_DarsenaNavigli_18',
+            layerName: 'layer_DarsenaNavigli_18',
+            pane: 'pane_DarsenaNavigli_18',
+            onEachFeature: pop_DarsenaNavigli_18,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_DarsenaNavigli_18_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_DarsenaNavigli_18);
+        map.addLayer(layer_DarsenaNavigli_18);
+        function pop_GaeAulenti_19(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var content = createAttractionPopup("Gae Aulenti");
+
+layer.bindPopup(content, {
+    maxWidth: 520,
+    maxHeight: 400
+});
+        }
+
+        function style_GaeAulenti_19_0() {
+            return {
+                pane: 'pane_GaeAulenti_19',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/GaeAulenti_19.svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_GaeAulenti_19');
+        map.getPane('pane_GaeAulenti_19').style.zIndex = 419;
+        map.getPane('pane_GaeAulenti_19').style['mix-blend-mode'] = 'normal';
+        var layer_GaeAulenti_19 = new L.geoJson(json_GaeAulenti_19, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_GaeAulenti_19',
+            layerName: 'layer_GaeAulenti_19',
+            pane: 'pane_GaeAulenti_19',
+            onEachFeature: pop_GaeAulenti_19,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_GaeAulenti_19_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_GaeAulenti_19);
+        map.addLayer(layer_GaeAulenti_19);
+        function pop_PortaRomana_20(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var content = createAttractionPopup("Porta Romana");
+
+layer.bindPopup(content, {
+    maxWidth: 520,
+    maxHeight: 400
+});
+        }
+
+        function style_PortaRomana_20_0() {
+            return {
+                pane: 'pane_PortaRomana_20',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/PortaRomana_20.svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_PortaRomana_20');
+        map.getPane('pane_PortaRomana_20').style.zIndex = 420;
+        map.getPane('pane_PortaRomana_20').style['mix-blend-mode'] = 'normal';
+        var layer_PortaRomana_20 = new L.geoJson(json_PortaRomana_20, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_PortaRomana_20',
+            layerName: 'layer_PortaRomana_20',
+            pane: 'pane_PortaRomana_20',
+            onEachFeature: pop_PortaRomana_20,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_PortaRomana_20_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_PortaRomana_20);
+        map.addLayer(layer_PortaRomana_20);
+        function pop_PortaVenezia_21(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var content = createAttractionPopup("Porta Venezia");
+
+layer.bindPopup(content, {
+    maxWidth: 520,
+    maxHeight: 400
+});
+        }
+
+        function style_PortaVenezia_21_0() {
+            return {
+                pane: 'pane_PortaVenezia_21',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/PortaVenezia_21.svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_PortaVenezia_21');
+        map.getPane('pane_PortaVenezia_21').style.zIndex = 421;
+        map.getPane('pane_PortaVenezia_21').style['mix-blend-mode'] = 'normal';
+        var layer_PortaVenezia_21 = new L.geoJson(json_PortaVenezia_21, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_PortaVenezia_21',
+            layerName: 'layer_PortaVenezia_21',
+            pane: 'pane_PortaVenezia_21',
+            onEachFeature: pop_PortaVenezia_21,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_PortaVenezia_21_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_PortaVenezia_21);
+        map.addLayer(layer_PortaVenezia_21);
+        function pop_SantAmbrogio_22(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var content = createAttractionPopup("Sant'Ambrogio");
+
+layer.bindPopup(content, {
+    maxWidth: 520,
+    maxHeight: 400
+});
+        }
+
+        function style_SantAmbrogio_22_0() {
+            return {
+                pane: 'pane_SantAmbrogio_22',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/SantAmbrogio_22.svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_SantAmbrogio_22');
+        map.getPane('pane_SantAmbrogio_22').style.zIndex = 422;
+        map.getPane('pane_SantAmbrogio_22').style['mix-blend-mode'] = 'normal';
+        var layer_SantAmbrogio_22 = new L.geoJson(json_SantAmbrogio_22, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_SantAmbrogio_22',
+            layerName: 'layer_SantAmbrogio_22',
+            pane: 'pane_SantAmbrogio_22',
+            onEachFeature: pop_SantAmbrogio_22,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_SantAmbrogio_22_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_SantAmbrogio_22);
+        map.addLayer(layer_SantAmbrogio_22);
+        function pop_StazioneCentrale_23(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var content = createAttractionPopup("Stazione Centrale");
+
+layer.bindPopup(content, {
+    maxWidth: 520,
+    maxHeight: 400
+});
+        }
+
+        function style_StazioneCentrale_23_0() {
+            return {
+                pane: 'pane_StazioneCentrale_23',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/StazioneCentrale_23.svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_StazioneCentrale_23');
+        map.getPane('pane_StazioneCentrale_23').style.zIndex = 423;
+        map.getPane('pane_StazioneCentrale_23').style['mix-blend-mode'] = 'normal';
+        var layer_StazioneCentrale_23 = new L.geoJson(json_StazioneCentrale_23, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_StazioneCentrale_23',
+            layerName: 'layer_StazioneCentrale_23',
+            pane: 'pane_StazioneCentrale_23',
+            onEachFeature: pop_StazioneCentrale_23,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_StazioneCentrale_23_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_StazioneCentrale_23);
+        map.addLayer(layer_StazioneCentrale_23);
+        var overlaysTree = [
+        {label: '<b>Cosa visitare</b>',  selectAllCheckbox: true, children: [
+            {label: '<img src="legend/StazioneCentrale_23.png" /> Stazione Centrale', layer: layer_StazioneCentrale_23},
+            {label: '<img src="legend/SantAmbrogio_22.png" /> Sant\'Ambrogio', layer: layer_SantAmbrogio_22},
+            {label: '<img src="legend/PortaVenezia_21.png" /> Porta Venezia', layer: layer_PortaVenezia_21},
+            {label: '<img src="legend/PortaRomana_20.png" /> Porta Romana', layer: layer_PortaRomana_20},
+            {label: '<img src="legend/GaeAulenti_19.png" /> Gae Aulenti', layer: layer_GaeAulenti_19},
+            {label: '<img src="legend/DarsenaNavigli_18.png" /> Darsena Navigli', layer: layer_DarsenaNavigli_18},
+            {label: '<img src="legend/ColonnediSanLorenzo_17.png" /> Colonne di San Lorenzo', layer: layer_ColonnediSanLorenzo_17},
+            {label: '<img src="legend/CimiteroMonumentale_16.png" /> Cimitero Monumentale', layer: layer_CimiteroMonumentale_16},
+            {label: '<img src="legend/CenacoloVinciano_15.png" /> Cenacolo Vinciano', layer: layer_CenacoloVinciano_15},
+            {label: '<img src="legend/ArcodellaPace_14.png" /> Arco della Pace', layer: layer_ArcodellaPace_14},
+            {label: '<img src="legend/Duomo_13.png" /> Duomo', layer: layer_Duomo_13},]},
+        {label: '<b>Dove mangiare</b>',  selectAllCheckbox: true, children: [
+            {label: 'Locali', layer: layer_Locali_12},]},
+        {label: '<b>10 minuti a piedi</b>', collapsed: true, selectAllCheckbox: true, children: [
+            {label: '<img src="legend/Duomo_11.png" /> Duomo', layer: layer_Duomo_11},
+            {label: '<img src="legend/ColonnediSanLorenzo_10.png" /> Colonne di San Lorenzo', layer: layer_ColonnediSanLorenzo_10},
+            {label: '<img src="legend/SantAmbrogio_9.png" /> Sant\'Ambrogio', layer: layer_SantAmbrogio_9},
+            {label: '<img src="legend/CenacoloVinciano_8.png" /> Cenacolo Vinciano', layer: layer_CenacoloVinciano_8},
+            {label: '<img src="legend/ArcodellaPace_7.png" /> Arco della Pace', layer: layer_ArcodellaPace_7},
+            {label: '<img src="legend/CimiteroMonumentale_6.png" /> Cimitero Monumentale', layer: layer_CimiteroMonumentale_6},
+            {label: '<img src="legend/GaeAulenti_5.png" /> Gae Aulenti', layer: layer_GaeAulenti_5},
+            {label: '<img src="legend/StazioneCentrale_4.png" /> Stazione Centrale', layer: layer_StazioneCentrale_4},
+            {label: '<img src="legend/PortaVenezia_3.png" /> Porta Venezia', layer: layer_PortaVenezia_3},
+            {label: '<img src="legend/DarsenaNavigli_2.png" /> Darsena Navigli', layer: layer_DarsenaNavigli_2},
+            {label: '<img src="legend/PortaRomana_1.png" /> Porta Romana', layer: layer_PortaRomana_1},]},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: true,
+        });
+// lay.addTo(map);   
+ const attractionLayers = {
+    "Duomo": layer_Duomo_13,
+    "Colonne di San Lorenzo": layer_ColonnediSanLorenzo_17,
+    "Sant'Ambrogio": layer_SantAmbrogio_22,
+    "Cenacolo Vinciano": layer_CenacoloVinciano_15,
+    "Arco della Pace": layer_ArcodellaPace_14,
+    "Cimitero Monumentale": layer_CimiteroMonumentale_16,
+    "Gae Aulenti": layer_GaeAulenti_19,
+    "Stazione Centrale": layer_StazioneCentrale_23,
+    "Porta Venezia": layer_PortaVenezia_21,
+    "Darsena Navigli": layer_DarsenaNavigli_18,
+    "Porta Romana": layer_PortaRomana_20 
+    }; 
+
+    Object.entries(attractionLayers).forEach(([name, layer]) => {
+    layer.eachLayer((marker) => {
+        marker.bindTooltip(name, {
+            permanent: true,
+            direction: "top",
+            offset: [0, -14],
+            className: "attraction-label"
+        });
+    });
+});
+
+const isochroneLayers = {
+  "Duomo": layer_Duomo_11,
+  "Colonne di San Lorenzo": layer_ColonnediSanLorenzo_10,
+  "Sant'Ambrogio": layer_SantAmbrogio_9,
+  "Cenacolo Vinciano": layer_CenacoloVinciano_8,
+  "Arco della Pace": layer_ArcodellaPace_7,
+  "Cimitero Monumentale": layer_CimiteroMonumentale_6,
+  "Gae Aulenti": layer_GaeAulenti_5,
+  "Stazione Centrale": layer_StazioneCentrale_4,
+  "Porta Venezia": layer_PortaVenezia_3,
+  "Darsena Navigli": layer_DarsenaNavigli_2,
+  "Porta Romana": layer_PortaRomana_1
+};
+
+const projectBounds = L.latLngBounds([]);
+
+Object.values(isochroneLayers).forEach((layer) => {
+    projectBounds.extend(layer.getBounds());
+});
+
+map.setMaxBounds(projectBounds.pad(0.05));
+
+Object.entries(attractionLayers).forEach(([name, layer]) => {
+    layer.eachLayer((marker) => {
+        marker.on('click', function () {
+            const select = document.getElementById('attraction-select');
+
+            if (select) {
+                select.value = name;
+                select.dispatchEvent(new Event('change'));
+            }
+        });
+    });
+});
+
+    const allLocalFeatures = json_Locali_12.features;
+
+function getActiveFilters() {
+    const selectedCategories = Array.from(
+        document.querySelectorAll(".category-filter:checked")
+    ).map((checkbox) => checkbox.value);
+
+    const minRating = Number(document.getElementById("rating-filter")?.value || 0);
+    const maxPriceValue = document.getElementById("price-filter")?.value || "all";
+    const maxPrice = maxPriceValue === "all" ? null : Number(maxPriceValue);
+
+    return { selectedCategories, minRating, maxPrice };
+}
+
+function priceLevelNumber(value) {
+    if (!value || value === 'N/D') return null;
+    const matches = String(value).match(/€/g);
+    return matches ? matches.length : null;
+}
+
+function passesUserFilters(feature, filters) {
+    const p = feature.properties || {};
+    const categoryMatch =
+        filters.selectedCategories.length === 0 ||
+        filters.selectedCategories.includes(p.categoria);
+
+    const rating = Number(p.rating);
+    const ratingMatch = filters.minRating <= 0 ||
+        (Number.isFinite(rating) && rating >= filters.minRating);
+
+    const priceNum = priceLevelNumber(p.prezzo_finale);
+    const priceMatch = filters.maxPrice == null ||
+        (priceNum != null && priceNum <= filters.maxPrice);
+
+    return categoryMatch && ratingMatch && priceMatch;
+}
+
+
+function showNearbyPlaces(userLatLng, radiusMeters = 800) {
+    const filters = getActiveFilters();
+
+    const nearbyCandidates = allLocalFeatures.filter((feature) => {
+        if (!feature.geometry || feature.geometry.type !== "Point") return false;
+
+        const coords = feature.geometry.coordinates;
+        const placeLatLng = L.latLng(coords[1], coords[0]);
+
+        const distance = userLatLng.distanceTo(placeLatLng);
+
+        return distance <= radiusMeters && passesUserFilters(feature, filters);
+    });
+
+    // The Foursquare layer contains one row per place-attraction association.
+    // For geolocation search, show each physical place only once.
+    const seenPlaceIds = new Set();
+    const nearbyFeatures = nearbyCandidates.filter((feature) => {
+        const id = feature.properties.place_id || JSON.stringify(feature.geometry.coordinates);
+        if (seenPlaceIds.has(id)) return false;
+        seenPlaceIds.add(id);
+        return true;
+    });
+
+    layer_Locali_12.clearLayers();
+    layer_Locali_12.addData(nearbyFeatures);
+
+    document.getElementById("results-count").textContent =
+        `${nearbyFeatures.length} locali trovati`;
+}
+
+layer_Locali_12.clearLayers();
+
+    document.getElementById('attraction-select').addEventListener('change', function () {
+    const selectedAttraction = this.value;
+    const selectedLayer = attractionLayers[selectedAttraction];
+
+Object.values(attractionLayers).forEach((layer) => {
+  layer.eachLayer((marker) => {
+    marker.unbindTooltip();
+  });
+});
+
+if (selectedLayer) {
+  selectedLayer.eachLayer((marker) => {
+    marker.bindTooltip(selectedAttraction, {
+      permanent: true,
+      direction: "top",
+      offset: [0, -14],
+      className: "attraction-label",
+    });
+  });
+}
+
+const selectedIsochrone = isochroneLayers[selectedAttraction];
+
+Object.values(isochroneLayers).forEach((layer) => {
+  if (map.hasLayer(layer)) {
+    map.removeLayer(layer);
+  }
+});
+
+if (
+  document.getElementById("isochrone-toggle").checked &&
+  selectedIsochrone
+) {
+  selectedIsochrone.addTo(map);
+}
+
+
+layer_Locali_12.clearLayers();
+
+
+const filters = getActiveFilters();
+
+const filteredFeatures = allLocalFeatures.filter((feature) => {
+    const attractionMatch = feature.properties.attrazione === selectedAttraction;
+    return attractionMatch && passesUserFilters(feature, filters);
+});
+
+layer_Locali_12.addData(filteredFeatures);
+
+document.getElementById("results-count").textContent =
+  `${filteredFeatures.length} locali trovati`;
+
+    if (selectedLayer) {
+    const responsiveZoom = window.innerWidth < 1300 ? 15.5 : 16;
+
+    map.fitBounds(selectedLayer.getBounds(), {
+        maxZoom: responsiveZoom,
+        padding: [40, 40]
+    });
+}
+}); 
+
+document.querySelectorAll(".category-filter").forEach((checkbox) => {
+    checkbox.addEventListener("change", function () {
+        document
+            .getElementById("attraction-select")
+            .dispatchEvent(new Event("change"));
+    });
+});
+
+["rating-filter", "price-filter"].forEach((id) => {
+    const control = document.getElementById(id);
+    if (control) {
+        control.addEventListener("change", function () {
+            const select = document.getElementById("attraction-select");
+            if (select && select.value) {
+                select.dispatchEvent(new Event("change"));
+            }
+        });
+    }
+});
+
+document
+  .getElementById("isochrone-toggle")
+  .addEventListener("change", function () {
+    const selectedAttraction =
+      document.getElementById("attraction-select").value;
+
+    const selectedIsochrone =
+      isochroneLayers[selectedAttraction];
+
+    Object.values(isochroneLayers).forEach((layer) => {
+      if (map.hasLayer(layer)) {
+        map.removeLayer(layer);
+      }
+    });
+
+    if (this.checked && selectedIsochrone) {
+      selectedIsochrone.addTo(map);
+    }
+  });
+
+     setBounds();
+        </script>        
+    </body>
+</html>

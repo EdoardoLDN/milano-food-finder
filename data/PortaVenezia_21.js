@@ -1,0 +1,1 @@
+var json_PortaVenezia_21 = {"type":"FeatureCollection","name":"PortaVenezia_21","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{"fid":9.0,"id":9.0,"nome":"Porta Venezia","categoria":"attrazione","descrizione":null},"geometry":{"type":"Point","coordinates":[9.204353643179006,45.474225600510721]}}]}

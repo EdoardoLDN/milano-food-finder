@@ -1,0 +1,1 @@
+var json_GaeAulenti_19 = {"type":"FeatureCollection","name":"GaeAulenti_19","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{"fid":7.0,"id":7.0,"nome":"Gae Aulenti","categoria":"attrazione","descrizione":null},"geometry":{"type":"Point","coordinates":[9.189454206346202,45.483497408166095]}}]}

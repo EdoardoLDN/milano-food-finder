@@ -1,0 +1,1 @@
+var json_SantAmbrogio_22 = {"type":"FeatureCollection","name":"SantAmbrogio_22","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{"fid":3.0,"id":3.0,"nome":"Sant'Ambrogio","categoria":"attrazione","descrizione":null},"geometry":{"type":"Point","coordinates":[9.174891114175765,45.462049383056019]}}]}

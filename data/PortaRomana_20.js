@@ -1,0 +1,1 @@
+var json_PortaRomana_20 = {"type":"FeatureCollection","name":"PortaRomana_20","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{"fid":null,"id":11.0,"nome":"Porta Romana","categoria":"attrazione","descrizione":null},"geometry":{"type":"Point","coordinates":[9.202155714810939,45.452199691576055]}}]}

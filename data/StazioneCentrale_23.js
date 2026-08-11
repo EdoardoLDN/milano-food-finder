@@ -1,0 +1,1 @@
+var json_StazioneCentrale_23 = {"type":"FeatureCollection","name":"StazioneCentrale_23","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{"fid":8.0,"id":8.0,"nome":"Stazione Centrale","categoria":"attrazione","descrizione":null},"geometry":{"type":"Point","coordinates":[9.203719268417492,45.485125403292102]}}]}
