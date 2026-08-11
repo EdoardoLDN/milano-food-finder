@@ -38890,7 +38890,7 @@ var json_Locali_12 = {
       properties: {
         fid: "1555",
         place_id: "ChIJWRJ_xPvDhkcRwi__yQJEvmA",
-        "nome":"Ristorante Pizzeria Teresa e Patrizia"
+        "nome":"Ristorante Pizzeria Teresa e Patrizia",
         categoria: "pizzeria",
         categoria_google: "italian_restaurant",
         latitudine: 45.45312,
