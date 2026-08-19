@@ -200,7 +200,7 @@ h1 {
 }
 
 .intro {
-    margin: 0 0 28px 0;
+    margin: 0 0 10px 0;
     font-size: 15px;
     line-height: 1.4;
     color: #555;
@@ -313,6 +313,38 @@ label {
 
 #mobile-menu-button {
     display: none;
+}
+
+.language-switcher {
+    display: flex;
+    justify-content: flex-start;
+    gap: 5px;
+    margin: 6px 0 12px 0;
+}
+
+.lang-btn {
+    width: auto !important;
+min-width: 0 !important;
+flex: 0 0 auto !important;
+    padding: 4px 8px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    background: #ffffff;
+    color: #555;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.lang-btn:hover {
+    background: #f2f2f2;
+}
+
+.lang-btn.active {
+    background: #1f6feb;
+    color: #ffffff;
+    border-color: #1f6feb;
 }
 
 /* ===== MOBILE ===== */
@@ -428,15 +460,20 @@ label {
     <h1>Milano Food Finder</h1>
 </div>
 
-        <p class="intro">
+<div class="language-switcher">
+    <button type="button" id="lang-it" class="lang-btn active">🇮🇹 ITA</button>
+    <button type="button" id="lang-en" class="lang-btn">🇬🇧 ENG</button>
+</div>
+
+        <p class="intro" id="intro-text">
             Trova dove mangiare vicino alle principali attrazioni di Milano.
         </p>
 
         <section class="panel-section start-section">
-            <h2>📍 Punto di partenza</h2>
+            <h2 id="start-title">📍 Punto di partenza</h2>
 
             <select id="attraction-select">
-                <option value="">Seleziona un'attrazione</option>
+                <option value="" id="select-placeholder">Seleziona un'attrazione</option>
                 <option value="Duomo">Duomo</option>
                 <option value="Colonne di San Lorenzo">Colonne di San Lorenzo</option>
                 <option value="Sant'Ambrogio">Sant'Ambrogio</option>
@@ -450,59 +487,59 @@ label {
                 <option value="Porta Romana">Porta Romana</option>
             </select>
 
-            <button id="location-button" type="button">
-                Usa la mia posizione
-            </button>
+           <button id="location-button" type="button">
+    <span id="location-button-text">Usa la mia posizione</span>
+</button>
         </section>
 
         <section class="panel-section">
-            <h2>🍴 Tipo di locale</h2>
+            <h2 id="type-title">🍴 Tipo di locale</h2>
 
             <p id="results-count" class="results-count">
-    Seleziona un punto di partenza
+    <span id="results-count-text">Seleziona un punto di partenza</span>
 </p>
 
             <label class="category-option">
                 <input class="category-filter" type="checkbox" value="ristorante" checked>
-                Ristoranti 🍽️
+                <span id="cat-restaurant">Ristoranti 🍽️</span>
             </label>
 
             <label class="category-option">
                 <input class="category-filter" type="checkbox" value="caffe" checked>
-                Caffè ☕
+                <span id="cat-cafe">Caffè ☕</span>
             </label>
 
             <label class="category-option">
                 <input class="category-filter" type="checkbox" value="bar" checked>
-                Bar 🍸
+                <span id="cat-bar">Bar 🍸</span>
             </label>
 
             <label class="category-option">
                 <input class="category-filter" type="checkbox" value="pub" checked>
-                Pub 🍺
+               <span id="cat-pub">Pub 🍺</span>
             </label>
 
             <label class="category-option">
                 <input class="category-filter" type="checkbox" value="fast_food" checked>
-                Fast food 🍔
+                <span id="cat-fastfood">Fast food 🍔</span>
             </label>
 
             <label class="category-option">
                 <input class="category-filter" type="checkbox" value="gelateria" checked>
-                Gelaterie 🍦
+                <span id="cat-gelateria">Gelaterie 🍦</span>
             </label>
 
             <label class="category-option">
                 <input class="category-filter" type="checkbox" value="pizzeria" checked>
-                Pizzerie 🍕
+                <span id="cat-pizzeria">Pizzerie 🍕</span>
             </label>
         </section>
 
         <section class="panel-section">
-            <h2>⭐ Valutazione</h2>
-            <label for="rating-filter" class="filter-label">Valutazione minima</label>
+            <h2 id="rating-title">⭐ Valutazione</h2>
+            <label for="rating-filter" id="rating-label">Valutazione minima</label>
             <select id="rating-filter" class="sidebar-select">
-                <option value="0">Tutte</option>
+                <option value="0" id="rating-all">Tutte</option>
                 <option value="3">3,0+ ⭐</option>
                 <option value="3.5">3,5+ ⭐</option>
                 <option value="4">4,0+ ⭐</option>
@@ -511,10 +548,10 @@ label {
         </section>
 
         <section class="panel-section">
-            <h2>💶 Fascia di prezzo</h2>
-            <label for="price-filter" class="filter-label">Prezzo massimo</label>
+            <h2 id="price-title">💵 Fascia di prezzo</h2>
+            <label for="price-filter" class="filter-label" id="price-label">Prezzo massimo</label>
             <select id="price-filter" class="sidebar-select">
-                <option value="all">Tutte</option>
+               <option value="all" id="price-all">Tutte</option>
                 <option value="1">€</option>
                 <option value="2">€€</option>
                 <option value="3">€€€</option>
@@ -525,7 +562,7 @@ label {
         <section class="panel-section">
             <label class="category-option isochrone-option">
                 <input id="isochrone-toggle" type="checkbox">
-                 Mostra l'area raggiungibile in 10 minuti 🚶
+                <span id="isochrone-text">Mostra l'area raggiungibile in 10 minuti 🚶</span>
             </label>
         </section>
         <div class="sidebar-footer">
@@ -602,13 +639,14 @@ label {
 );
 
 positron.addTo(map);
-       
+let currentLang = "it";      
 const attractionInfo = {
    "Duomo": {
     title: "Duomo di Milano",
     image: "images/attractions/duomo.jpg",
     address: "Piazza del Duomo, Milano",
     description: "Il simbolo di Milano e una delle cattedrali gotiche più celebri al mondo.",
+    descriptionEn: "The symbol of Milan and one of the world's most famous Gothic cathedrals.",
     maps: "https://maps.google.com/?q=Duomo+di+Milano"
 },
     "Colonne di San Lorenzo": {
@@ -616,6 +654,7 @@ const attractionInfo = {
     image: "images/attractions/colonne_san_lorenzo.jpg",
     address: "Corso di Porta Ticinese, Milano",
     description: "Uno dei luoghi più vivaci di Milano, celebre per le antiche colonne romane e la vita serale.",
+    descriptionEn: "One of Milan's liveliest spots, famous for its ancient Roman columns and vibrant nightlife.",
     maps: "https://maps.google.com/?q=Colonne+di+San+Lorenzo+Milano"
 },
     "Sant'Ambrogio": {
@@ -623,6 +662,7 @@ const attractionInfo = {
     image: "images/attractions/sant_ambrogio.jpg",
     address: "Piazza Sant'Ambrogio, Milano",
     description: "Una delle chiese più antiche e importanti di Milano, simbolo della città e dell'architettura romanica.",
+    descriptionEn: "One of Milan's oldest and most important churches, a symbol of the city's history.",
     maps: "https://maps.google.com/?q=Basilica+di+Sant+Ambrogio+Milano"
 },
     "Cenacolo Vinciano": {
@@ -630,6 +670,7 @@ const attractionInfo = {
     image: "images/attractions/cenacolo_vinciano.jpg",
     address: "Piazza di Santa Maria delle Grazie, Milano",
     description: "Ospita l'Ultima Cena di Leonardo da Vinci, uno dei capolavori più celebri della storia dell'arte.",
+    descriptionEn: "Home to Leonardo da Vinci's Last Supper, one of the most famous works of art in the world.",
     maps: "https://maps.google.com/?q=Cenacolo+Vinciano+Milano"
 },
     "Arco della Pace": {
@@ -637,6 +678,7 @@ const attractionInfo = {
     image: "images/attractions/arco_della_pace.jpg",
     address: "Piazza Sempione, Milano",
     description: "Monumento neoclassico tra i simboli di Milano, affacciato sul Parco Sempione.",
+    descriptionEn: "One of Milan's most iconic monuments, located at the entrance to Parco Sempione.",
     maps: "https://maps.google.com/?q=Arco+della+Pace+Milano"
 },
     "Cimitero Monumentale": {
@@ -644,6 +686,7 @@ const attractionInfo = {
     image: "images/attractions/cimitero_monumentale.jpg",
     address: "Piazzale Cimitero Monumentale, Milano",
     description: "Un museo a cielo aperto che custodisce monumenti, sculture e tombe di grande valore artistico.",
+    descriptionEn: "One of Milan's most fascinating monumental sites, known for its sculptures, architecture and historic tombs.",
     maps: "https://maps.google.com/?q=Cimitero+Monumentale+Milano"
 },
     "Gae Aulenti": {
@@ -651,6 +694,7 @@ const attractionInfo = {
     image: "images/attractions/gae_aulenti.jpg",
     address: "Piazza Gae Aulenti, Milano",
     description: "Il cuore della Milano contemporanea, circondato da grattacieli, negozi e spazi pubblici moderni.",
+    descriptionEn: "The heart of modern Milan, surrounded by contemporary architecture and skyscrapers.",
     maps: "https://maps.google.com/?q=Piazza+Gae+Aulenti+Milano"
 },
     "Stazione Centrale": {
@@ -658,6 +702,7 @@ const attractionInfo = {
     image: "images/attractions/stazione_centrale.jpeg",
     address: "Piazza Duca d'Aosta, Milano",
     description: "Una delle stazioni ferroviarie più grandi d'Europa e importante punto di accesso alla città.",
+    descriptionEn: "Milan's main railway station, known for its monumental architecture.",
     maps: "https://maps.google.com/?q=Stazione+Centrale+Milano"
 },
     "Porta Venezia": {
@@ -665,6 +710,7 @@ const attractionInfo = {
     image: "images/attractions/porta_venezia.jpg",
     address: "Porta Venezia, Milano",
     description: "Storica porta d'accesso alla città, oggi punto di riferimento tra architettura, shopping e cultura.",
+    descriptionEn: "A lively area of Milan known for its historic architecture, shopping streets and nightlife.",
     maps: "https://maps.google.com/?q=Porta+Venezia+Milano"
 },
     "Porta Romana": {
@@ -672,6 +718,7 @@ const attractionInfo = {
     image: "images/attractions/porta_romana.jpg",
     address: "Porta Romana, Milano",
     description: "Una delle antiche porte di Milano, oggi cuore di un vivace quartiere ricco di storia e locali.",
+    descriptionEn: "Milan's historic dock and one of the city's most popular areas for restaurants, bars and nightlife.",
     maps: "https://maps.google.com/?q=Porta+Romana+Milano"
 },
     "Darsena Navigli": {
@@ -679,6 +726,7 @@ const attractionInfo = {
     image: "images/attractions/darsena.jpg",
     address: "Piazza XXIV Maggio, Milano",
     description: "Il cuore dei Navigli, ideale per passeggiare, rilassarsi e vivere la vivace atmosfera milanese.",
+    descriptionEn: "A historic district of Milan, known for its restaurants, nightlife and characteristic streets.",
     maps: "https://maps.google.com/?q=Darsena+Milano"
 },
 };
@@ -700,7 +748,8 @@ function createAttractionPopup(name) {
         </p>
 
         <p class="attraction-popup__description">
-          ${info.description}
+          ${currentLang === "en" ? info.descriptionEn : info.description}
+
         </p>
 
         <a
@@ -709,7 +758,7 @@ function createAttractionPopup(name) {
           target="_blank"
           rel="noopener noreferrer"
         >
-         Apri in Google Maps
+         ${currentLang === "en" ? "Open in Google Maps" : "Apri in Google Maps"}
         </a>
       </div>
 
@@ -1635,6 +1684,7 @@ map.on('locationfound', function(e) {
         });
         bounds_group.addLayer(layer_Duomo_11);
         function pop_Locali_12(feature, layer) {
+            
             layer.on({
                 mouseout: function(e) {
                     for (var i in e.target._eventParents) {
@@ -1646,23 +1696,24 @@ map.on('locationfound', function(e) {
                 mouseover: highlightFeature,
             });
 
+            function createLocalPopupContent() {
             const p = feature.properties;
             const latlng = layer.getLatLng();
 
             const categoryLabels = {
-                ristorante: "Ristorante",
-                caffe: "Caffè",
-                bar: "Bar",
-                pub: "Pub",
-                fast_food: "Fast food",
-                gelateria: "Gelateria",
-                pizzeria: "Pizzeria"
-            };
+    ristorante: currentLang === "en" ? "Restaurant" : "Ristorante",
+    caffe: currentLang === "en" ? "Café" : "Caffè",
+    bar: "Bar",
+    pub: "Pub",
+    fast_food: "Fast food",
+    gelateria: currentLang === "en" ? "Ice cream shop" : "Gelateria",
+    pizzeria: "Pizzeria"
+};
 
-            const categoryName = categoryLabels[p.categoria] || p.categoria || "Locale";
+            const categoryName = categoryLabels[p.categoria] || p.categoria || (currentLang === "en" ? "Venue" : "Locale");
 
             const distanceRow = p.distanza_m != null
-    ? `<div style="margin:4px 0 10px 0;font-weight:400;color:#555;">🚶 ${Math.round(Number(p.distanza_m))} m da ${p.attrazione || ""}</div>`
+    ? `<div style="margin:4px 0 10px 0;font-weight:400;color:#555;">🚶 ${Math.round(Number(p.distanza_m))} m ${currentLang === "en" ? "from" : "da"} ${p.attrazione || ""}</div>`
     : "";
 
             const hasRating = p.rating !== null && p.rating !== undefined && p.rating !== "";
@@ -1670,11 +1721,11 @@ map.on('locationfound', function(e) {
 const ratingValue = hasRating ? Number(p.rating) : null;
 
 const ratingRow = hasRating && Number.isFinite(ratingValue)
-    ? `<div style="margin-top:8px;">⭐ <strong>${ratingValue.toFixed(1).replace('.', ',')} / 5</strong>${p.numero_recensioni != null ? ` (${p.numero_recensioni} valutazioni)` : ""}</div>`
+    ? `<div style="margin-top:8px;">⭐ <strong>${currentLang === "en" ? ratingValue.toFixed(1) : ratingValue.toFixed(1).replace(".", ",")} / 5</strong>${p.numero_recensioni != null ? ` (${p.numero_recensioni} ${currentLang === "en" ? "reviews" : "valutazioni"})` : ""}</div>`
     : "";
 
             const priceRow = p.prezzo_finale && p.prezzo_finale !== 'N/D'
-                ? `<div style="margin-top:8px;">💶 Fascia di prezzo: <strong>${p.prezzo_finale}</strong></div>`
+                ? `<div style="margin-top:8px;">💶 ${currentLang === "en" ? "Price range" : "Fascia di prezzo"}: <strong>${p.prezzo_finale}</strong></div>`
                 : "";
 
             const addressRow = p.indirizzo
@@ -1689,7 +1740,7 @@ const ratingRow = hasRating && Number.isFinite(ratingValue)
                   rel="noopener noreferrer"
                   style="display:inline-block; padding:8px 12px; background:#2563eb; color:#fff !important; text-decoration:none; border-radius:6px; font-weight:600;"
                 >
-                  Apri posizione in Google Maps
+                  ${currentLang === "en" ? "Open location in Google Maps" : "Apri posizione in Google Maps"}
                 </a>
               </div>
             `;
@@ -1709,8 +1760,9 @@ const ratingRow = hasRating && Number.isFinite(ratingValue)
                 ${mapsRow}
               </div>
             `;
-
-            layer.bindPopup(popupContent, { maxWidth: 330, maxHeight: 420 });
+return popupContent;
+}
+            layer.bindPopup(createLocalPopupContent, { maxWidth: 330, maxHeight: 420 });
         }
 
         function style_Locali_12_0(feature) {
@@ -1753,7 +1805,7 @@ const ratingRow = hasRating && Number.isFinite(ratingValue)
             },
         });
         bounds_group.addLayer(layer_Locali_12);
-        map.addLayer(layer_Locali_12);
+              map.addLayer(layer_Locali_12);
         function pop_Duomo_13(feature, layer) {
             layer.on({
                 mouseout: function(e) {
@@ -1771,7 +1823,9 @@ const ratingRow = hasRating && Number.isFinite(ratingValue)
 				addClassToPopupIfMedia(content, e.popup);
 			});
 
-			layer.bindPopup(content, {
+			layer.bindPopup(function () {
+    return createAttractionPopup("Duomo");
+}, {
         maxWidth: 520,
         maxHeight: 400
     });
@@ -1825,7 +1879,9 @@ const ratingRow = hasRating && Number.isFinite(ratingValue)
             });
             var content = createAttractionPopup("Arco della Pace");
 
-layer.bindPopup(content, {
+layer.bindPopup(function () {
+    return createAttractionPopup("Arco della Pace");
+}, {
     maxWidth: 520,
     maxHeight: 400
 });
@@ -1876,7 +1932,9 @@ layer.bindPopup(content, {
             });
             var content = createAttractionPopup("Cenacolo Vinciano");
 
-layer.bindPopup(content, {
+layer.bindPopup(function () {
+    return createAttractionPopup("Cenacolo Vinciano");
+}, {
     maxWidth: 520,
     maxHeight: 400
 });
@@ -1927,7 +1985,9 @@ layer.bindPopup(content, {
             });
             var content = createAttractionPopup("Cimitero Monumentale");
 
-layer.bindPopup(content, {
+layer.bindPopup(function () {
+    return createAttractionPopup("Cimitero Monumentale");
+}, {
     maxWidth: 520,
     maxHeight: 400
 });
@@ -1978,7 +2038,9 @@ layer.bindPopup(content, {
             });
             var content = createAttractionPopup("Colonne di San Lorenzo");
 
-layer.bindPopup(content, {
+layer.bindPopup(function () {
+    return createAttractionPopup("Colonne di San Lorenzo");
+}, {
     maxWidth: 520,
     maxHeight: 400
 });
@@ -2029,7 +2091,9 @@ layer.bindPopup(content, {
             });
             var content = createAttractionPopup("Darsena Navigli");
 
-layer.bindPopup(content, {
+layer.bindPopup(function () {
+    return createAttractionPopup("Darsena Navigli");
+}, {
     maxWidth: 520,
     maxHeight: 400
 });
@@ -2080,7 +2144,9 @@ layer.bindPopup(content, {
             });
             var content = createAttractionPopup("Gae Aulenti");
 
-layer.bindPopup(content, {
+layer.bindPopup(function () {
+    return createAttractionPopup("Gae Aulenti");
+}, {
     maxWidth: 520,
     maxHeight: 400
 });
@@ -2131,7 +2197,9 @@ layer.bindPopup(content, {
             });
             var content = createAttractionPopup("Porta Romana");
 
-layer.bindPopup(content, {
+layer.bindPopup(function () {
+    return createAttractionPopup("Porta Romana");
+}, {
     maxWidth: 520,
     maxHeight: 400
 });
@@ -2182,7 +2250,9 @@ layer.bindPopup(content, {
             });
             var content = createAttractionPopup("Porta Venezia");
 
-layer.bindPopup(content, {
+layer.bindPopup(function () {
+    return createAttractionPopup("Porta Venezia");
+}, {
     maxWidth: 520,
     maxHeight: 400
 });
@@ -2233,7 +2303,9 @@ layer.bindPopup(content, {
             });
             var content = createAttractionPopup("Sant'Ambrogio");
 
-layer.bindPopup(content, {
+layer.bindPopup(function () {
+    return createAttractionPopup("Sant'Ambrogio");
+}, {
     maxWidth: 520,
     maxHeight: 400
 });
@@ -2284,7 +2356,9 @@ layer.bindPopup(content, {
             });
             var content = createAttractionPopup("Stazione Centrale");
 
-layer.bindPopup(content, {
+layer.bindPopup(function () {
+    return createAttractionPopup("Stazione Centrale");
+}, {
     maxWidth: 520,
     maxHeight: 400
 });
@@ -2485,7 +2559,7 @@ function showNearbyPlaces(userLatLng, radiusMeters = 800) {
     layer_Locali_12.addData(nearbyFeatures);
 
     document.getElementById("results-count").textContent =
-        `${nearbyFeatures.length} locali trovati`;
+        `${nearbyFeatures.length} ${currentLang === "en" ? "venues found" : "locali trovati"}`;
 }
 
 layer_Locali_12.clearLayers();
@@ -2540,7 +2614,7 @@ const filteredFeatures = allLocalFeatures.filter((feature) => {
 layer_Locali_12.addData(filteredFeatures);
 
 document.getElementById("results-count").textContent =
-  `${filteredFeatures.length} locali trovati`;
+  `${filteredFeatures.length} ${currentLang === "en" ? "venues found" : "locali trovati"}`;
 
     if (selectedLayer) {
     const responsiveZoom = window.innerWidth < 1300 ? 15.5 : 16;
@@ -2607,5 +2681,143 @@ mobileMenuButton.addEventListener("click", function () {
     }, 300);
 });
 </script>     
+<script>
+    
+
+const langIt = document.getElementById("lang-it");
+const langEn = document.getElementById("lang-en");
+langEn.addEventListener("click", function () {
+    currentLang = "en";
+    document.getElementById("intro-text").textContent =
+        "Find places to eat near Milan's main attractions.";
+
+document.getElementById("rating-all").textContent = "All";
+document.querySelectorAll("#rating-filter option").forEach((option) => {
+    option.textContent = option.textContent.replace(",", ".");
+});
+document.getElementById("price-all").textContent = "All";
+
+    document.getElementById("start-title").textContent =
+        "📍 Starting point";
+
+    document.getElementById("select-placeholder").textContent =
+        "Select an attraction";
+
+    document.getElementById("location-button-text").textContent =
+        "Use my location";
+
+    document.getElementById("type-title").textContent =
+       "🍴 Venue type";
+
+    document.getElementById("rating-title").textContent =
+        "⭐ Rating";
+
+    document.getElementById("rating-label").textContent =
+        "Minimum rating";
+
+    document.getElementById("price-title").textContent =
+        "💶 Price range";
+
+    document.getElementById("price-label").textContent =
+        "Maximum price";
+
+        document.getElementById("cat-restaurant").textContent =
+    "Restaurants 🍽️";
+
+    document.getElementById("cat-cafe").textContent =
+    "Cafés ☕";
+
+document.getElementById("cat-bar").textContent =
+    "Bar 🍸";
+
+document.getElementById("cat-pub").textContent =
+    "Pubs 🍺";
+
+document.getElementById("cat-fastfood").textContent =
+    "Fast food 🍔";
+
+document.getElementById("cat-gelateria").textContent =
+    "Ice cream shops 🍦";
+
+document.getElementById("cat-pizzeria").textContent =
+    "Pizzerias 🍕";
+
+    document.getElementById("isochrone-text").textContent =
+        "Show the area reachable within 10 minutes 🚶";
+
+const resultsCount = document.getElementById("results-count");
+if (resultsCount && /^\d+/.test(resultsCount.textContent.trim())) {
+    const count = resultsCount.textContent.trim().match(/^\d+/)[0];
+    resultsCount.textContent = `${count} venues found`;
+}
+
+if (map._popup) {
+    map._popup.update();
+}
+
+    langIt.classList.remove("active");
+    langEn.classList.add("active");
+});
+
+langIt.addEventListener("click", function () {
+    currentLang = "it";
+    document.getElementById("intro-text").textContent =
+        "Trova dove mangiare vicino alle principali attrazioni di Milano.";
+
+    document.getElementById("start-title").textContent =
+        "📍 Punto di partenza";
+
+    document.getElementById("select-placeholder").textContent =
+        "Seleziona un'attrazione";
+
+    document.getElementById("location-button-text").textContent =
+        "Usa la mia posizione";
+
+    document.getElementById("type-title").textContent =
+        "🍴 Tipo di locale";
+
+    document.getElementById("cat-restaurant").textContent = "Ristoranti 🍽️";
+    document.getElementById("cat-cafe").textContent = "Caffè ☕";
+    document.getElementById("cat-bar").textContent = "Bar 🍸";
+    document.getElementById("cat-pub").textContent = "Pub 🍺";
+    document.getElementById("cat-fastfood").textContent = "Fast food 🍔";
+    document.getElementById("cat-gelateria").textContent = "Gelaterie 🍦";
+    document.getElementById("cat-pizzeria").textContent = "Pizzerie 🍕";
+
+    document.getElementById("rating-title").textContent =
+        "⭐ Valutazione";
+
+    document.getElementById("rating-label").textContent =
+        "Valutazione minima";
+
+    document.getElementById("rating-all").textContent = "Tutte";
+document.querySelectorAll("#rating-filter option").forEach((option) => {
+    option.textContent = option.textContent.replace(".", ",");
+});
+    document.getElementById("price-title").textContent =
+        "💶 Fascia di prezzo";
+
+    document.getElementById("price-label").textContent =
+        "Prezzo massimo";
+
+    document.getElementById("price-all").textContent = "Tutte";
+
+    document.getElementById("isochrone-text").textContent =
+        "Mostra l'area raggiungibile in 10 minuti 🚶";
+
+const resultsCount = document.getElementById("results-count");
+if (resultsCount && /^\d+/.test(resultsCount.textContent.trim())) {
+    const count = resultsCount.textContent.trim().match(/^\d+/)[0];
+    resultsCount.textContent = `${count} locali trovati`;
+}
+
+if (map._popup) {
+    map._popup.update();
+}
+
+    langEn.classList.remove("active");
+    langIt.classList.add("active");
+});
+</script>
     </body>
 </html>
