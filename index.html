@@ -566,8 +566,8 @@ flex: 0 0 auto !important;
             </label>
         </section>
         <div class="sidebar-footer">
-    <div>Progetto WebGIS · Milano</div>
-    <div>Dati locali: Google Places · Isocrone: TravelTime · Base cartografica: CARTO / OpenStreetMap</div>
+    <div id="footer-project">Progetto WebGIS · Milano</div>
+    <div id="footer-sources">Dati locali: Google Places · Isocrone: ORS Tools (OpenRouteService) · Base cartografica: CARTO / OpenStreetMap</div>
 </div>
     </aside>
 
@@ -2745,10 +2745,19 @@ document.getElementById("cat-pizzeria").textContent =
     document.getElementById("isochrone-text").textContent =
         "Show the area reachable within 10 minutes 🚶";
 
+document.getElementById("footer-project").textContent =
+    "WebGIS project · Milan";
+
+document.getElementById("footer-sources").textContent =
+    "Venue data: Google Places · Isochrones: ORS Tools (OpenRouteService) · Basemap: CARTO / OpenStreetMap";
+
 const resultsCount = document.getElementById("results-count");
+
 if (resultsCount && /^\d+/.test(resultsCount.textContent.trim())) {
     const count = resultsCount.textContent.trim().match(/^\d+/)[0];
     resultsCount.textContent = `${count} venues found`;
+} else if (resultsCount) {
+    resultsCount.textContent = "Select a starting point";
 }
 
 if (map._popup) {
@@ -2805,10 +2814,19 @@ document.querySelectorAll("#rating-filter option").forEach((option) => {
     document.getElementById("isochrone-text").textContent =
         "Mostra l'area raggiungibile in 10 minuti 🚶";
 
+document.getElementById("footer-project").textContent =
+    "Progetto WebGIS · Milano";
+
+document.getElementById("footer-sources").textContent =
+    "Dati locali: Google Places · Isocrone: ORS Tools (OpenRouteService) · Base cartografica: CARTO / OpenStreetMap";
+
 const resultsCount = document.getElementById("results-count");
+
 if (resultsCount && /^\d+/.test(resultsCount.textContent.trim())) {
     const count = resultsCount.textContent.trim().match(/^\d+/)[0];
     resultsCount.textContent = `${count} locali trovati`;
+} else if (resultsCount) {
+    resultsCount.textContent = "Seleziona un punto di partenza";
 }
 
 if (map._popup) {
