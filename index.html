@@ -347,6 +347,126 @@ flex: 0 0 auto !important;
     border-color: #1f6feb;
 }
 
+/* ===== MOBILE WELCOME ===== */
+
+.mobile-welcome {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-welcome {
+        position: fixed;
+        inset: 0;
+        z-index: 3000;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 24px;
+        background: rgba(20, 30, 40, 0.48);
+        backdrop-filter: blur(3px);
+    }
+
+    .mobile-welcome__card {
+        position: relative;
+        width: min(100%, 360px);
+        padding: 30px 24px 24px;
+
+        background: #ffffff;
+        border-radius: 18px;
+        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.24);
+
+        text-align: center;
+    }
+
+.mobile-welcome__languages {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 0 0 14px;
+}
+
+.mobile-welcome__lang {
+    width: auto;
+    margin: 0;
+    padding: 5px 10px;
+
+    border: 1px solid #d6d6d6;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #333333;
+
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mobile-welcome__lang.active {
+    border-color: #1a73e8;
+    background: #1a73e8;
+    color: #ffffff;
+}
+
+    .mobile-welcome__logo {
+        width: 58px;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+    .mobile-welcome__title {
+        margin: 0 0 10px;
+        font-size: 25px;
+        line-height: 1.15;
+        color: #222222;
+    }
+
+    .mobile-welcome__text {
+        margin: 0 0 22px;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #555555;
+    }
+
+    .mobile-welcome__start {
+        width: 100%;
+        margin: 0;
+        padding: 12px 16px;
+
+        border: none;
+        border-radius: 9px;
+        background: #1a73e8;
+        color: #ffffff;
+
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .mobile-welcome__start:hover {
+        background: #1557b0;
+    }
+
+    .mobile-welcome__close {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+
+        width: 36px;
+        height: 36px;
+        margin: 0;
+        padding: 0;
+
+        border: none;
+        background: transparent;
+        color: #666666;
+
+        font-size: 25px;
+        line-height: 36px;
+        cursor: pointer;
+    }
+}
+
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
 
@@ -453,6 +573,72 @@ flex: 0 0 auto !important;
 </title>    </head>
     <body>
         <div id="app">
+            <div
+    id="mobile-welcome"
+    class="mobile-welcome"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="mobile-welcome-title"
+>
+    <div class="mobile-welcome__card">
+
+        <button
+            id="mobile-welcome-close"
+            class="mobile-welcome__close"
+            type="button"
+            aria-label="Chiudi"
+        >
+            ×
+        </button>
+
+<div class="mobile-welcome__languages">
+    <button
+        id="mobile-welcome-lang-it"
+        class="mobile-welcome__lang active"
+        type="button"
+    >
+        🇮🇹 ITA
+    </button>
+
+    <button
+        id="mobile-welcome-lang-en"
+        class="mobile-welcome__lang"
+        type="button"
+    >
+        🇬🇧 ENG
+    </button>
+</div>
+
+        <img
+            src="stemma-milano.svg"
+            alt="Stemma di Milano"
+            class="mobile-welcome__logo"
+        >
+
+        <h2
+            id="mobile-welcome-title"
+            class="mobile-welcome__title"
+        >
+            Milano Food Finder
+        </h2>
+
+        <p
+    id="mobile-welcome-text"
+    class="mobile-welcome__text"
+>
+    Scopri dove mangiare vicino alle principali attrazioni di Milano. Scegli un'attrazione per vedere i locali raggiungibili in 10 minuti a piedi, oppure usa la tua posizione.
+</p>
+
+        <button
+            id="mobile-welcome-start"
+            class="mobile-welcome__start"
+            type="button"
+        >
+           Inizia la ricerca
+        </button>
+
+    </div>
+</div>
             <button id="mobile-menu-button" type="button">≡ Filtri</button>
     <aside id="sidebar">
         <div class="brand-header">
@@ -847,8 +1033,17 @@ function createAttractionPopup(name) {
             }
         }
         var zoomControl = L.control.zoom({
-            position: 'topleft'
-        }).addTo(map);
+    position: window.innerWidth <= 768 ? 'topright' : 'topleft'
+}).addTo(map);
+
+function updateZoomControlPosition() {
+    const newPosition =
+        window.innerWidth <= 768 ? 'topright' : 'topleft';
+
+    zoomControl.setPosition(newPosition);
+}
+
+window.addEventListener('resize', updateZoomControlPosition);
         var locateControl = L.control.locate({
     locateOptions: {
         maxZoom: 19
@@ -2677,6 +2872,33 @@ document
 const mobileMenuButton = document.getElementById("mobile-menu-button");
 const sidebar = document.getElementById("sidebar");
 
+const mobileWelcome = document.getElementById("mobile-welcome");
+const mobileWelcomeClose = document.getElementById("mobile-welcome-close");
+const mobileWelcomeStart = document.getElementById("mobile-welcome-start");
+
+function closeMobileWelcome() {
+    mobileWelcome.style.display = "none";
+
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
+}
+
+mobileWelcomeClose.addEventListener("click", function () {
+    closeMobileWelcome();
+});
+
+mobileWelcomeStart.addEventListener("click", function () {
+    closeMobileWelcome();
+
+    sidebar.classList.add("mobile-open");
+    mobileMenuButton.classList.add("open");
+
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 300);
+});
+
 mobileMenuButton.addEventListener("click", function () {
     sidebar.classList.toggle("mobile-open");
     mobileMenuButton.classList.toggle("open");
@@ -2691,6 +2913,41 @@ mobileMenuButton.addEventListener("click", function () {
 
 const langIt = document.getElementById("lang-it");
 const langEn = document.getElementById("lang-en");
+const mobileWelcomeLangIt =
+    document.getElementById("mobile-welcome-lang-it");
+
+const mobileWelcomeLangEn =
+    document.getElementById("mobile-welcome-lang-en");
+
+function setMobileWelcomeLanguage(language) {
+    const isEnglish = language === "en";
+
+    document.getElementById("mobile-welcome-text").textContent =
+        isEnglish
+            ? "Discover places to eat near Milan's main attractions. Choose an attraction to see venues within a 10-minute walk, or use your location."
+            : "Scopri dove mangiare vicino alle principali attrazioni di Milano. Scegli un'attrazione per vedere i locali raggiungibili in 10 minuti a piedi, oppure usa la tua posizione.";
+
+    document.getElementById("mobile-welcome-start").textContent =
+        isEnglish ? "Start exploring" : "Inizia la ricerca";
+
+    document.getElementById("mobile-welcome-close").setAttribute(
+        "aria-label",
+        isEnglish ? "Close" : "Chiudi"
+    );
+
+    mobileWelcomeLangIt.classList.toggle("active", !isEnglish);
+    mobileWelcomeLangEn.classList.toggle("active", isEnglish);
+}
+
+mobileWelcomeLangIt.addEventListener("click", function () {
+    setMobileWelcomeLanguage("it");
+    langIt.click();
+});
+
+mobileWelcomeLangEn.addEventListener("click", function () {
+    setMobileWelcomeLanguage("en");
+    langEn.click();
+});
 langEn.addEventListener("click", function () {
     currentLang = "en";
     document.getElementById("intro-text").textContent =
