@@ -883,13 +883,18 @@ map.on('locationfound', function(e) {
 
         var bounds_group = new L.featureGroup([]);
         function setBounds() {
+    const projectBounds = L.latLngBounds(
+        [45.445, 9.155],
+        [45.495, 9.220]
+    );
+
+    map.setMaxBounds(projectBounds);
+
     if (window.innerWidth <= 768) {
         map.setZoom(map.getZoom() - 1);
-        map.setMinZoom(map.getZoom());
-    } else {
-        map.setMaxBounds(map.getBounds());
-        map.setMinZoom(map.getZoom());
     }
+
+    map.setMinZoom(map.getZoom());
 }
         function pop_PortaRomana_1(feature, layer) {
             layer.on({
