@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="css/qgis2web.css">
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <link rel="stylesheet" href="css/leaflet.photon.css"> 
+		<link href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css" rel="stylesheet">
 
     <style>
 
@@ -758,7 +759,7 @@ flex: 0 0 auto !important;
         </section>
         <div class="sidebar-footer">
     <div id="footer-project">Progetto WebGIS · Milano</div>
-    <div id="footer-sources">Dati locali: Google Places · Isocrone: ORS Tools (OpenRouteService) · Base cartografica: CARTO / OpenStreetMap</div>
+    <div id="footer-sources">Dati locali: Google Places · Isocrone: ORS Tools (OpenRouteService) · Base cartografica: OpenFreeMap / OpenStreetMap</div>
 </div>
     </aside>
 
@@ -766,6 +767,8 @@ flex: 0 0 auto !important;
 </div>
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
+		<script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+        <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
         <script src="js/L.Control.Layers.Tree.min.js"></script>
         <script src="js/L.Control.Locate.min.js"></script>
         <script src="js/leaflet.rotatedMarker.js"></script>
@@ -819,16 +822,23 @@ flex: 0 0 auto !important;
     zoomSnap: 0.5
 }).setView([45.4642, 9.1900], 13.5);
        
-       var positron = L.tileLayer(
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
-    attribution:
-      '&copy; OpenStreetMap contributors',
-        subdomains: ["a", "b", "c"],
-  }
-);
+       var positron = L.maplibreGL({
+    style: 'https://tiles.openfreemap.org/styles/bright'
+}).addTo(map);
 
-positron.addTo(map);
+positron.getMaplibreMap().once('load', function () {
+    var glMap = positron.getMaplibreMap();
+
+    [
+        'poi_transit',
+        'poi_transit_labels',
+        'Station labels'
+    ].forEach(function (layerId) {
+        if (glMap.getLayer(layerId)) {
+            glMap.setLayoutProperty(layerId, 'visibility', 'none');
+        }
+    });
+});
 let currentLang = "it";      
 const attractionInfo = {
    "Duomo": {
