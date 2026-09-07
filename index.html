@@ -820,10 +820,10 @@ flex: 0 0 auto !important;
 }).setView([45.4642, 9.1900], 13.5);
        
        var positron = L.tileLayer(
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
   {
     attribution:
-      '&copy; OpenStreetMap contributors',
+      '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
     subdomains: ["a", "b", "c"],
   }
 );
