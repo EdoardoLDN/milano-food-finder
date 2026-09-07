@@ -815,12 +815,11 @@ flex: 0 0 auto !important;
 }).setView([45.4642, 9.1900], 13.5);
        
        var positron = L.tileLayer(
-  "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   {
     attribution:
-      '&copy; OpenStreetMap contributors &copy; CARTO',
-    subdomains: "abcd",
-    maxZoom: 20,
+      '&copy; OpenStreetMap contributors',
+    subdomains: ["a", "b", "c"],
   }
 );
 
